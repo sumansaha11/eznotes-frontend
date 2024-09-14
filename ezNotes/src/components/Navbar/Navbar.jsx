@@ -41,20 +41,27 @@ const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
         handleClearSearch();
     };
 
-    return (
-        <div className="bg-blue-300 flex items-center justify-between px-6 py-2 drop-shadow"> <h2 className="text-xl font-medium text-black py-2">ezNotes</h2>
-
-            <SearchBar
-                value={searchQuery} onChange={({ target }) => {
-                    setSearchQuery(target.value);
-                }}
-                handleSearch={handleSearch}
-                onClearSearch={onClearSearch}
-            />
-
-            <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
-        </div>
-    )
-}
+    if (userInfo) {
+        return (
+            <div className="bg-blue-300 flex items-center justify-between px-6 py-2 drop-shadow"> <h2 className="text-xl font-medium text-black py-2">ezNotes</h2>
+    
+                <SearchBar
+                    value={searchQuery} onChange={({ target }) => {
+                        setSearchQuery(target.value);
+                    }}
+                    handleSearch={handleSearch}
+                    onClearSearch={onClearSearch}
+                />
+    
+                <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
+            </div>
+        )
+    } else {
+        return (
+            <div className="bg-blue-300 flex items-center justify-between px-6 py-2 drop-shadow"> <h2 className="text-xl font-medium text-black py-2">ezNotes</h2>
+            </div>
+        )
+    }
+};
 
 export default Navbar;
