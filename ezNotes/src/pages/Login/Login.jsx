@@ -1,14 +1,17 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar.jsx';
-import { Link } from 'react-router-dom';
 import PasswordInput from "../../components/Input/PasswordInput.jsx";
 import { validateEmail } from "../../utils/helper.js";
+import axiosInstance from '../../utils/axiosInstance.js';
 
 const Login = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
+
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -17,13 +20,30 @@ const Login = () => {
             setError("Please enter a valid email address");
             return;
         }
-
         if (!password) {
             setError("Please enter the password");
             return;
         }
 
-        setError("")
+        setError("");
+
+        try {
+            const response = await axiosInstance.post("/users/login",
+                {
+                    email: email,
+                    password: password,
+                },
+                {
+                    withCredentials: true
+                }
+            );
+            if (response.data && response.data.data && response.data.data.accessToken) {
+                navigate("/dashboard");
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Invalid login credentials!";
+            setError(errorMessage);
+        }
     };
 
     return (
@@ -35,7 +55,7 @@ const Login = () => {
                     <form onSubmit={handleLogin}>
                         <h4 className="text-2xl mb-7">Login</h4>
 
-                        <input 
+                        <input
                             type="text"
                             placeholder="Email"
                             className="input-box"
@@ -67,4 +87,4 @@ const Login = () => {
     );
 };
 
-export default Login
+export default Login;

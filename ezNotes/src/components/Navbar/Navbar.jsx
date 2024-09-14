@@ -2,20 +2,43 @@ import React, { useState } from 'react'
 import ProfileInfo from '../Cards/ProfileInfo.jsx'
 import { useNavigate } from 'react-router-dom';
 import SearchBar from '../SearchBar/SearchBar.jsx';
+import axiosInstance from '../../utils/axiosInstance.js';
+import { Cookies } from 'react-cookie';
 
-const Navbar = () => {
+const Navbar = ({ userInfo, onSearchNote, handleClearSearch }) => {
 
     const [searchQuery, setSearchQuery] = useState("")
-    const navigate = useNavigate;
+    const navigate = useNavigate();
+    const cookie = new Cookies();
 
-    const onLogout = () => {
-        navigate("/login");
+    const options = {
+        sameSite: 'Strict',
+        path: '/',
     };
 
-    const handleSearch = () => { };
+    const onLogout = async () => {
+        try {
+            const response = await axiosInstance.post("/users/logout");
+
+            if (response.data && response.data.data) {
+                cookie.remove('accessToken', options);
+                cookie.remove('refreshToken', options);
+                navigate("/login");
+            }
+        } catch (error) {
+            console.log("Error while logging out user!");
+        }
+    };
+
+    const handleSearch = () => {
+        if(searchQuery) {
+            onSearchNote(searchQuery);
+        }
+    };
 
     const onClearSearch = () => {
         setSearchQuery("");
+        handleClearSearch();
     };
 
     return (
@@ -29,9 +52,9 @@ const Navbar = () => {
                 onClearSearch={onClearSearch}
             />
 
-            <ProfileInfo onLogout={onLogout} />
+            <ProfileInfo userInfo={userInfo} onLogout={onLogout} />
         </div>
     )
 }
 
-export default Navbar
+export default Navbar;

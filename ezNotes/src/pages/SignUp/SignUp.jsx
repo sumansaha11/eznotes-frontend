@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Navbar from '../../components/Navbar/Navbar.jsx';
 import PasswordInput from '../../components/Input/PasswordInput.jsx';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { validateEmail } from '../../utils/helper.js';
+import axiosInstance from '../../utils/axiosInstance.js';
 
 const SignUp = () => {
 
@@ -10,6 +11,8 @@ const SignUp = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
+
+    const navigate = useNavigate();
 
     const handleSignUp = async (e) => {
         e.preventDefault();
@@ -30,6 +33,22 @@ const SignUp = () => {
         }
 
         setError("")
+
+        try {
+            const response = await axiosInstance.post("/users/register",
+                {
+                    fullname: name,
+                    email: email,
+                    password: password,
+                },
+            );
+            if (response.data && response.data.data) {
+                navigate("/login");
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Invalid login credentials!";
+            setError(errorMessage);
+        }
     };
 
     return (
